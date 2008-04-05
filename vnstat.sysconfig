@@ -5,3 +5,13 @@
 #
 # the following sets vnstat up to monitor eth0
 VNSTAT_OPTIONS="-u -i eth0"
+
+# whether to send daily reports [yes|no]
+VNSTAT_SEND_DAILY_REPORT="yes"
+
+# who send daily reports to
+VNSTAT_EMAIL="root@lcalhost"
+
+# sendmail paths and options
+SENDMAIL="/usr/sbin/sendmail"
+SENDMAIL_OPTIONS="-oi -t"
