@@ -1,0 +1,33 @@
+#!/bin/sh
+
+. /etc/rc.d/init.d/functions
+
+if [ ! -f /etc/sysconfig/vnstat ]; then
+	echo "/etc/sysconfig/vnstat missing";
+	exit 1
+fi;
+
+. /etc/sysconfig/vnstat
+
+# quit if we are told not to send reports
+if ! is_yes "${VNSTAT_SEND_DAILY_REPORT}"; then
+	exit
+fi
+
+(
+cat <<EOF
+To: ${VNSTAT_EMAIL}
+Subject: vnStat daily report
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Summary:
+
+$(/usr/bin/vnstat)
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Detailed statistics: 
+
+$(/usr/bin/vnstat --hours)
+EOF
+) | ${SENDMAIL} ${SENDMAIL_OPTIONS}
