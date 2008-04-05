@@ -10,12 +10,15 @@ Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
 Source1:	%{name}.sysconfig
 Source2:	%{name}.cron
 Source3:	%{name}-cron
+Source4:	%{name}-report
 URL:		http://humdi.net/vnstat/
 BuildRequires:	rpmbuild(macros) >= 1.202
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires:	crondaemon
+Requires:	smtpdaemon
 Provides:	group(vnstat)
 Provides:	user(vnstat)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -53,6 +56,7 @@ install -p cfg/vnstat.conf $RPM_BUILD_ROOT%{_sysconfdir}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name}
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
+install %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
@@ -75,5 +79,6 @@ fi
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %{_mandir}/man1/*
 %attr(755,root,root) %{_bindir}/%{name}
+%attr(755,root,root) %{_bindir}/%{name}-report
 %attr(755,root,root) %{_sbindir}/%{name}-cron
 %attr(750,vnstat,vnstat)%{_localstatedir}/lib/%{name}
