@@ -1,20 +1,36 @@
 Summary:	Console-based network traffic monitor
+Summary(pl.UTF-8):	Konsolowe narzędzie do monitorowania ruchu sieciowego
 Name:		vnstat
 Version:	1.6
 Release:	1
 License:	GPL v2
 Group:		Daemons
-URL:		http://humdi.net/vnstat/
 Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
+# Source0-md5:	ccaffe8e70d47e0cf2f25e52daa25712
+Source1:	%{name}.sysconfig
+Source2:	%{name}.cron
+Source3:	%{name}-cron
+URL:		http://humdi.net/vnstat/
+BuildRequires:	rpmbuild(macros) >= 1.202
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Provides:	group(vnstat)
+Provides:	user(vnstat)
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 vnStat is a console-based network traffic monitor that keeps a log of
 daily network traffic for the selected interface(s). vnStat isn't a
 packet sniffer. The traffic information is analyzed from the
-/proc-filesystem, so vnStat can be used without root permissions. See
-the webpage for few 'screenshots'.
+/proc-filesystem.
+
+%description -l pl_PL.UTF-8
+vnStat to konsolowe narzędzie do monitorowania ruchu sieciowego, które
+przechowuje zapis dziennego ruchu dla wybranych interfejsów. vnStat
+nie jest programem do posłuchu pakietów. Ruch sieciowyc jest
+analizowany na podstawie informacji z systemu plików /proc.
 
 %prep
 %setup -q
@@ -24,63 +40,32 @@ the webpage for few 'screenshots'.
 
 %build
 %{__make} \
+	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__rm} -rf $RPM_BUILD_ROOT
-%{__mkdir_p} $RPM_BUILD_ROOT%{_bindir}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_sbindir}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_mandir}/man1
-%{__mkdir_p} $RPM_BUILD_ROOT%{_localstatedir}/lib/%{name}
-%{__mkdir_p} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d
-%{__mkdir_p} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
-
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_sbindir},%{_mandir}/man1}
+install -d $RPM_BUILD_ROOT{%{_localstatedir}/lib/%{name},%{_sysconfdir}/{cron.d,sysconfig}}
 install -p man/vnstat.1 $RPM_BUILD_ROOT%{_mandir}/man1
 install -p src/vnstat $RPM_BUILD_ROOT%{_bindir}
 install -p cfg/vnstat.conf $RPM_BUILD_ROOT%{_sysconfdir}
-
-%{__cat} >> $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name} << END
-MAILTO=root
-# to enable interface monitoring via vnstat remove comment on next line
-# */5 * * * *  vnstat %{_sbindir}/%{name}.cron
-END
-
-%{__cat} >> $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name} << END
-# see also: vnstat(1)
-#
-# starting with vnstat-1.6 vnstat can also be
-# configured via %{_sysconfdir}/vnstat.conf
-#
-# the following sets vnstat up to monitor eth0
-VNSTAT_OPTIONS="-u -i eth0"
-END
-
-%{__cat} >> $RPM_BUILD_ROOT%{_sbindir}/%{name}.cron << END
-#!/bin/bash
-# this script (%{_sbindir}/%{name}.cron) reads %{_sysconfdir}/sysconfig/%{name}
-# to start %{_bindir}/%{name}.
-# example for %{_sysconfdir}/sysconfig/%{name}:
-# VNSTAT_OPTIONS="-u -i eth0"
-# see also: vnstat(1)
-
-VNSTAT_CONF=%{_sysconfdir}/sysconfig/%{name}
-
-if [ ! -f $VNSTAT_CONF ]; then
-	exit 0
-fi
-
-. \$VNSTAT_CONF
-
-%{_bindir}/%{name} \$VNSTAT_OPTIONS
-END
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
+install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name}
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
 %pre
-%{_sbindir}/useradd -r -s /sbin/nologin -d %{_localstatedir}/lib/%{name} \
-	-M -c "vnStat user" %{name} > /dev/null 2>&1 || :
+%groupadd -g 195 vnstat
+%useradd -u 195 -g 195 vnstat
+
+%postun
+if [ "$1" = 0 ]; then
+	%userremove vnstat
+	%groupremove vnstat
+fi
 
 %files
 %defattr(644,root,root,755)
@@ -90,5 +75,5 @@ END
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %{_mandir}/man1/*
 %attr(755,root,root) %{_bindir}/%{name}
-%attr(755,root,root)%{_sbindir}/%{name}.cron
-%attr(-,vnstat,vnstat)%{_localstatedir}/lib/%{name}
+%attr(755,root,root) %{_sbindir}/%{name}-cron
+%attr(750,vnstat,vnstat)%{_localstatedir}/lib/%{name}
