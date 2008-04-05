@@ -1,0 +1,7 @@
+# see also: vnstat(1)
+#
+# starting with vnstat-1.6 vnstat can also be
+# configured via %{_sysconfdir}/vnstat.conf
+#
+# the following sets vnstat up to monitor eth0
+VNSTAT_OPTIONS="-u -i eth0"
