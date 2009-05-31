@@ -1,12 +1,12 @@
 Summary:	Console-based network traffic monitor
 Summary(pl.UTF-8):	Konsolowe narzędzie do monitorowania ruchu sieciowego
 Name:		vnstat
-Version:	1.6
+Version:	1.7
 Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
-# Source0-md5:	ccaffe8e70d47e0cf2f25e52daa25712
+# Source0-md5:	e5788e8122e34f2c93561e2a84c19432
 Source1:	%{name}.sysconfig
 Source2:	%{name}.cron
 Source3:	%{name}-cron
@@ -73,7 +73,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES COPYING FAQ README INSTALL cron pppd
+%doc CHANGES COPYING FAQ README INSTALL cron
 %config(noreplace) %{_sysconfdir}/%{name}.conf
 %config(noreplace) /etc/cron.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
