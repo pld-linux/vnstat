@@ -29,7 +29,7 @@ daily network traffic for the selected interface(s). vnStat isn't a
 packet sniffer. The traffic information is analyzed from the
 /proc-filesystem.
 
-%description -l pl_PL.UTF-8
+%description -l pl.UTF-8
 vnStat to konsolowe narzędzie do monitorowania ruchu sieciowego, które
 przechowuje zapis dziennego ruchu dla wybranych interfejsów. vnStat
 nie jest programem do posłuchu pakietów. Ruch sieciowyc jest
