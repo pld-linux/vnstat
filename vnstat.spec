@@ -59,7 +59,7 @@ install %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}
 
 %clean
-%{__rm} -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
 
 %pre
 %groupadd -g 195 vnstat
