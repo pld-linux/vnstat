@@ -1,5 +1,5 @@
 MAILTO=root
-# collect data every 5 minutes
-*/5 * * * *  vnstat /usr/sbin/vnstat-cron
+# uncomment below line to collect data every 5 minutes via cron daemon
+#*/5 * * * *  vnstat /usr/sbin/vnstat-cron
 # daily reports
 5 0 * * * vnstat /usr/bin/vnstat-report
