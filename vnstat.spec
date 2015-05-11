@@ -3,12 +3,12 @@
 Summary:	Console-based network traffic monitor
 Summary(pl.UTF-8):	Konsolowe narzędzie do monitorowania ruchu sieciowego
 Name:		vnstat
-Version:	1.12
+Version:	1.14
 Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
-# Source0-md5:	a154b2196771e06a8accd1c24374009c
+# Source0-md5:	1df5dccff4d84f2995f840db4cac2ed0
 Source1:	%{name}.sysconfig
 Source2:	%{name}.cron
 Source3:	%{name}-cron
