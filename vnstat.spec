@@ -3,12 +3,12 @@
 Summary:	Console-based network traffic monitor
 Summary(pl.UTF-8):	Konsolowe narzędzie do monitorowania ruchu sieciowego
 Name:		vnstat
-Version:	1.14
+Version:	1.15
 Release:	1
 License:	GPL v2
 Group:		Daemons
 Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
-# Source0-md5:	1df5dccff4d84f2995f840db4cac2ed0
+# Source0-md5:	351051ef3005e3ca99123eec07ac0a7d
 Source1:	%{name}.sysconfig
 Source2:	%{name}.cron
 Source3:	%{name}-cron
@@ -16,6 +16,8 @@ Source4:	%{name}-report
 Source5:	%{name}.service
 Source6:	%{name}.tmpfiles
 URL:		http://humdi.net/vnstat/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	rpmbuild(macros) >= 1.671
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
@@ -45,9 +47,11 @@ analizowany na podstawie informacji z systemu plików /proc.
 %setup -q
 
 %build
-%{__make} \
-	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags}"
+%{__aclocal}
+%{__autoconf}
+%{__automake}
+%configure
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
