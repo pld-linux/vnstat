@@ -92,9 +92,6 @@ if [ "$1" = 0 ]; then
 fi
 %systemd_reload
 
-%triggerpostun -- vnstat < 1.12-1
-%systemd_service_enable vnstat.service
-
 %files
 %defattr(644,root,root,755)
 %doc CHANGES COPYING FAQ README INSTALL
