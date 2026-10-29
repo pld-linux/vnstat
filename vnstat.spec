@@ -1,30 +1,36 @@
 # TODO: add SysV init file?
+#
+# Conditional build:
+%bcond_without	tests	# unit tests
 
 Summary:	Console-based network traffic monitor
 Summary(pl.UTF-8):	Konsolowe narzędzie do monitorowania ruchu sieciowego
 Name:		vnstat
-Version:	1.15
+Version:	2.13
 Release:	1
 License:	GPL v2
 Group:		Daemons
-Source0:	http://humdi.net/vnstat/%{name}-%{version}.tar.gz
-# Source0-md5:	351051ef3005e3ca99123eec07ac0a7d
+Source0:	https://humdi.net/vnstat/%{name}-%{version}.tar.gz
+# Source0-md5:	c5a0b17b6585fca6f7d51999c7085330
 Source1:	%{name}.sysconfig
 Source2:	%{name}.cron
-Source3:	%{name}-cron
 Source4:	%{name}-report
 Source5:	%{name}.service
 Source6:	%{name}.tmpfiles
-URL:		http://humdi.net/vnstat/
+URL:		https://humdi.net/vnstat/
 BuildRequires:	autoconf
 BuildRequires:	automake
+%{?with_tests:BuildRequires:	check-devel >= 0.9.6}
+BuildRequires:	pkgconfig
 BuildRequires:	rpmbuild(macros) >= 1.671
+BuildRequires:	sqlite3-devel
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(post,preun,postun):	systemd-units >= 38
 Requires:	crondaemon
+Requires:	rc-scripts
 Requires:	smtpdaemon
 Requires:	systemd-units >= 38
 Provides:	group(vnstat)
@@ -50,8 +56,14 @@ analizowany na podstawie informacji z systemu plików /proc.
 %{__aclocal}
 %{__autoconf}
 %{__automake}
-%configure
+%configure \
+	--disable-extra-paths \
+	--disable-image-output
 %{__make}
+
+%if %{with tests}
+%{__make} check
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -65,12 +77,14 @@ install -d $RPM_BUILD_ROOT%{_localstatedir}/{lib,log}/%{name} \
 	$RPM_BUILD_ROOT/var/run/%{name}
 cp -p %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/cron.d/%{name}
-cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sbindir}
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{systemdunitdir}/vnstat.service
 cp -p %{SOURCE6} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/vnstat.conf
 
 touch $RPM_BUILD_ROOT/var/log/%{name}/%{name}.log
+
+# installed even when vnstati is not built
+%{__rm} $RPM_BUILD_ROOT%{_mandir}/man1/vnstati.1
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -81,6 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 %systemd_post vnstat.service
+# 2.x vnstatd imports 1.x databases on start; vnstat reads none before that
+%systemd_service_restart vnstat.service
 
 %preun
 %systemd_preun vnstat.service
@@ -94,13 +110,12 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES COPYING FAQ README INSTALL
+%doc CHANGES COPYING FAQ README INSTALL UPGRADE
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.conf
 %config(noreplace) %verify(not md5 mtime size) /etc/cron.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/%{name}-report
-%attr(755,root,root) %{_sbindir}/%{name}-cron
 %attr(755,root,root) %{_sbindir}/vnstatd
 %attr(750,vnstat,vnstat)%{_localstatedir}/lib/%{name}
 %{systemdunitdir}/%{name}.service
@@ -109,5 +124,5 @@ fi
 %attr(750,vnstat,vnstat) %dir /var/log/%{name}
 %attr(640,vnstat,vnstat) %ghost /var/log/%{name}/%{name}.log
 %{_mandir}/man1/vnstat.1*
-%{_mandir}/man1/vnstatd.1*
+%{_mandir}/man8/vnstatd.8*
 %{_mandir}/man5/vnstat.conf.5*

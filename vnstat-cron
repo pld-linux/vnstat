@@ -1,9 +1,0 @@
-#!/bin/sh
-
-VNSTAT_CONF=/etc/sysconfig/vnstat
-
-[ -f $VNSTAT_CONF ] || exit 0
-
-. $VNSTAT_CONF
-
-/usr/bin/vnstat $VNSTAT_OPTIONS

@@ -1,16 +1,10 @@
-# see also: vnstat(1)
-#
-# starting with vnstat-1.6 vnstat can also be
-# configured via %{_sysconfdir}/vnstat.conf
-#
-# the following sets vnstat up to monitor eth0
-VNSTAT_OPTIONS="-u -i eth0"
+# vnstat-report settings; vnstatd is configured in /etc/vnstat.conf
 
 # whether to send daily reports [yes|no]
 VNSTAT_SEND_DAILY_REPORT="yes"
 
 # who send daily reports to
-VNSTAT_EMAIL="root@lcalhost"
+VNSTAT_EMAIL="root@localhost"
 
 # sendmail paths and options
 SENDMAIL="/usr/sbin/sendmail"
